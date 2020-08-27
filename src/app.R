@@ -30,7 +30,7 @@ ui <- fluidPage(
                   max = 5,
                   value = 3),
 
-      actionButton("button", "Refresh") # procs the graph to refresh, which should rerandomize
+      #actionButton("button", "Refresh") # procs the graph to refresh, which should rerandomize
     ),
 
     # Main panel
@@ -47,7 +47,7 @@ server <- function(input, output) {
 
 
   output$nodePlot <- renderPlot({
-    # generates the output plot
+    # generates the output plot semi randomly
     node_names <- LETTERS[1:input$nodes]
     graph      <- new("graphNEL",nodes=node_names)
     # pre allocates vectors to be numeric vecs of the same size of the total cons
@@ -56,7 +56,6 @@ server <- function(input, output) {
     n_weights  <- numeric(input$nodes*input$cons) # weights are currently all equal
     index      <- 1
     for (node_i in 1:input$nodes) {
-
       for (con_i in 1:input$cons) {
         out <- sample(1:input$nodes, 1)
 
@@ -70,7 +69,14 @@ server <- function(input, output) {
 
     graph <- addEdge(from=n_from, to=n_to, graph=graph, weights=n_weights)
 
-    igplot(graph)
+    # hameltonian stuff
+    edge_weights <- rep(1, length(edgeNames(graph)))
+    path <- compute_hameltonian(graph)
+    edge_weights[path] <- 5
+    edge_colour <- rep("grey40", length(edge_weights))
+    edge_colour[path] <- "cyan"
+
+    igplot(graph, edge.width=edge_weights, edge.color=edge_colour)
     })
 
 }

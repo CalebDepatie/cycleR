@@ -21,6 +21,15 @@ igplot <- function(g,weights=FALSE,layout=igraph::layout_in_circle,
     par(op)
 }
 
+# compute the hameltonian path
+compute_hameltonian <- function(graph) {
+  # $nodes -> node names
+  # $edgeL$<node>$edges -> appears to give edges connected to a node
+  print(graph)
+
+  return() # switch to a custom algorithm
+}
+
 # creates a ref class as a represenation of graph nodes
 #node <- setRefClass("node", fields=list(id="numeric", connectedTo="list"))
 
