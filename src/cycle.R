@@ -26,16 +26,19 @@ node_check <- function(graph, cur_node, next_node) {
   edges_cur  <- graph@edgeL[[LETTERS[cur_node]]]$edges
   edges_next <- graph@edgeL[[LETTERS[next_node]]]$edges
 
+  print(edges_cur)
+  print(edges_next)
+
   for (edge_cur in edges_cur) {
-    for (edge_next in edges_cur) {
+    for (edge_next in edges_next) {
       if (edge_cur == edge_next) {
+        print(edge_cur)
+        print(edge_next)
         return(edge_cur) # returns the index of the edge
       }
     }
   }
 
-  print(edges_cur)
-  print(edges_next)
 
   return(0)
 }
@@ -47,7 +50,11 @@ recurse_cycle <- function(graph, cur_node, path=c()) {
   if (line == 0) {
     return(c()) # a returned zero means the nodes are NOT adj
   } else {
-    return(recurse_cycle(graph, cur_node+1, path=append(path, line)))
+    if (length(graph@nodes) == cur_node+1) {
+      return(append(path, line))
+    } else {
+      return(recurse_cycle(graph, cur_node+1, path=append(path, line)))
+    }
   }
 }
 
@@ -59,6 +66,8 @@ compute_hamiltonian <- function(graph) {
   cur_node <- 1 # possible cycle through starting nodes?
 
   path <- recurse_cycle(graph, cur_node)
+  print("")
+  print(path)
 
   return(path) # switch to a custom algorithm
 }
