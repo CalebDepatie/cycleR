@@ -21,13 +21,32 @@ igplot <- function(g,weights=FALSE,layout=igraph::layout_in_circle,
     par(op)
 }
 
+# helper function to check for a path between two nodes
+node_check <- function(graph, cur_node, next_node) {
+  edges_cur  <- graph@edgeL[LETTERS[cur_node]]
+  edges_next <- graph@edgeL[LETTERS[next_node]]
+
+  print(edges_cur)
+  print(edges_next)
+
+  return(1)
+}
+
+# recursive function to compute the hamiltonian cycle
+recurse_cycle <- function(graph, cur_node) {
+  node_check(graph, cur_node, cur_node+1)
+}
+
 # compute the hameltonian path
-compute_hameltonian <- function(graph) {
+compute_hamiltonian <- function(graph) {
   # $nodes -> node names
   # $edgeL$<node>$edges -> appears to give edges connected to a node
-  print(graph)
+  # Both edges and nodes have distinct identifiers
+  cur_node <- 1 # possible cycle through starting nodes?
 
-  return() # switch to a custom algorithm
+  path <- recurse_cycle(graph, cur_node)
+
+  return(path) # switch to a custom algorithm
 }
 
 # creates a ref class as a represenation of graph nodes

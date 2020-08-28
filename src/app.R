@@ -15,7 +15,7 @@ ui <- fluidPage(
 
     # Sidebar panel
     sidebarPanel(
-      p("cycleR is a visual demonstration of a hamiltonian cycle, and it allows you to customize the nodes. Tweak these settings and explore the output!"),
+      p("cycleR is a visual demonstration of a hamiltonian cycle, and it allows you to customize the nodes. Tweak these settings and explore the output! (Graphs without a blue 'path' are not Hamiltonian graphs)"),
 
       # options inputs
       sliderInput(inputId = "nodes",
@@ -71,7 +71,7 @@ server <- function(input, output) {
 
     # hameltonian stuff
     edge_weights <- rep(1, length(edgeNames(graph)))
-    path <- compute_hameltonian(graph)
+    path <- compute_hamiltonian(graph)
     edge_weights[path] <- 5
     edge_colour <- rep("grey40", length(edge_weights))
     edge_colour[path] <- "cyan"
