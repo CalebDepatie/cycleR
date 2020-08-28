@@ -23,18 +23,32 @@ igplot <- function(g,weights=FALSE,layout=igraph::layout_in_circle,
 
 # helper function to check for a path between two nodes
 node_check <- function(graph, cur_node, next_node) {
-  edges_cur  <- graph@edgeL[LETTERS[cur_node]]
-  edges_next <- graph@edgeL[LETTERS[next_node]]
+  edges_cur  <- graph@edgeL[[LETTERS[cur_node]]]$edges
+  edges_next <- graph@edgeL[[LETTERS[next_node]]]$edges
+
+  for (edge_cur in edges_cur) {
+    for (edge_next in edges_cur) {
+      if (edge_cur == edge_next) {
+        return(edge_cur) # returns the index of the edge
+      }
+    }
+  }
 
   print(edges_cur)
   print(edges_next)
 
-  return(1)
+  return(0)
 }
 
 # recursive function to compute the hamiltonian cycle
-recurse_cycle <- function(graph, cur_node) {
-  node_check(graph, cur_node, cur_node+1)
+# this is a fairly naive algorithm
+recurse_cycle <- function(graph, cur_node, path=c()) {
+  line <- node_check(graph, cur_node, cur_node+1)
+  if (line == 0) {
+    return(c()) # a returned zero means the nodes are NOT adj
+  } else {
+    return(recurse_cycle(graph, cur_node+1, path=append(path, line)))
+  }
 }
 
 # compute the hameltonian path
