@@ -20,15 +20,15 @@ ui <- fluidPage(
       # options inputs
       sliderInput(inputId = "nodes",
                   label = "Number of nodes:",
-                  min = 1,
+                  min = 2,
                   max = 10,
-                  value = 7),
+                  value = 4),
 
       sliderInput(inputId = "cons",
                   label = "Outbound connections per node:",
                   min = 1,
                   max = 5,
-                  value = 3),
+                  value = 2),
 
       #actionButton("button", "Refresh") # procs the graph to refresh, which should rerandomize
     ),
@@ -58,6 +58,10 @@ server <- function(input, output) {
     for (node_i in 1:input$nodes) {
       for (con_i in 1:input$cons) {
         out <- sample(1:input$nodes, 1)
+        # dont have connections that go to themselves
+        while (node_i == out) {
+          out <- sample(1:input$nodes, 1)
+        }
 
         n_from[index]    <- node_names[node_i]
         n_to[index]      <- node_names[out]
@@ -70,11 +74,11 @@ server <- function(input, output) {
     graph <- addEdge(from=n_from, to=n_to, graph=graph, weights=n_weights)
 
     # hameltonian stuff
-    edge_weights <- rep(1, length(edgeNames(graph)))
-    path <- compute_hamiltonian(graph)
+    edge_weights       <- rep(1, length(edgeNames(graph)))
+    path               <- compute_hamiltonian(graph, n_from, n_to)
     edge_weights[path] <- 5
-    edge_colour <- rep("grey40", length(edge_weights))
-    edge_colour[path] <- "cyan"
+    edge_colour        <- rep("grey40", length(edge_weights))
+    edge_colour[path]  <- "cyan"
 
     igplot(graph, edge.width=edge_weights, edge.color=edge_colour)
     })
