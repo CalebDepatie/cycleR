@@ -68,18 +68,23 @@ recurse_cycle <- function(graph, cur_node, nodes_left, edges, path=c()) {
   for (next_node in nodes_left) {
     line <- node_check(graph, cur_node, next_node, edges) # possibly change to not requiring linearly moving through nodes
     if (line != 0) {
-      break
-    }
-  }
-  if (line == 0) {
-    return(c()) # a returned zero means the nodes are NOT adj
-  } else {
-    if (length(nodes_left) == 1) {
-      return(append(path, line))
+      if (length(nodes_left) == 1) {
+        return(append(path, line))
+      }
+      tmp <- recurse_cycle(graph, next_node, nodes_left[!nodes_left %in% next_node], edges, path=append(path, line))
+      if (is.null(tmp)) {
+        # if the cycle on this path ended up not finding a proper path, try with the next valid node
+        next
+      } else {
+        return(tmp)
+      }
     } else {
-      return(recurse_cycle(graph, next_node, nodes_left[!nodes_left %in% next_node], edges, path=append(path, line)))
+      # if node_check did not find a valid path try again
+      next
     }
   }
+  # if something goes wrong it wasnt able to find a valid path
+  return(c())
 }
 
 # compute the hameltonian path
