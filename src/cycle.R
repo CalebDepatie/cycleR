@@ -116,6 +116,7 @@ compute_hamiltonian <- function(graph, to, from) {
   #print(edges)
 
   nodes_left <- 1:length(graph@nodes)
+
   for (cur_node in nodes_left) { # cycles through starting node
     path <- recurse_cycle(graph, cur_node, nodes_left[!nodes_left %in% cur_node], edges)
     if (!is.null(path)) {

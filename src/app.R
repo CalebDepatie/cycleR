@@ -30,7 +30,8 @@ ui <- fluidPage(
                   max = 5,
                   value = 2),
 
-      #actionButton("button", "Refresh") # procs the graph to refresh, which should rerandomize
+
+      actionButton("refresh", "Refresh") # procs the graph to refresh, which should rerandomize
     ),
 
     # Main panel
@@ -45,43 +46,46 @@ ui <- fluidPage(
 # shiny server component
 server <- function(input, output) {
 
+  observeEvent(input$refresh, {
 
-  output$nodePlot <- renderPlot({
-    # generates the output plot semi randomly
-    node_names <- LETTERS[1:input$nodes]
-    graph      <- new("graphNEL",nodes=node_names)
-    # pre allocates vectors to be numeric vecs of the same size of the total cons
-    n_to       <- character(input$nodes*input$cons)
-    n_from     <- character(input$nodes*input$cons)
-    n_weights  <- numeric(input$nodes*input$cons) # weights are currently all equal
-    index      <- 1
-    for (node_i in 1:input$nodes) {
-      for (con_i in 1:input$cons) {
-        out <- sample(1:input$nodes, 1)
-        # dont have connections that go to themselves
-        while (node_i == out) {
+    output$nodePlot <- renderPlot({
+      # generates the output plot semi randomly
+      node_names <- LETTERS[1:input$nodes]
+      graph      <- new("graphNEL",nodes=node_names)
+      # pre allocates vectors to be numeric vecs of the same size of the total cons
+      n_to       <- character(input$nodes*input$cons)
+      n_from     <- character(input$nodes*input$cons)
+      n_weights  <- numeric(input$nodes*input$cons) # weights are currently all equal
+      index      <- 1
+      for (node_i in 1:input$nodes) {
+        for (con_i in 1:input$cons) {
           out <- sample(1:input$nodes, 1)
+          # dont have connections that go to themselves
+          while (node_i == out) {
+            out <- sample(1:input$nodes, 1)
+          }
+
+          n_from[index]    <- node_names[node_i]
+          n_to[index]      <- node_names[out]
+          n_weights[index] <- 1
+
+          index = index + 1
         }
-
-        n_from[index]    <- node_names[node_i]
-        n_to[index]      <- node_names[out]
-        n_weights[index] <- 1
-
-        index = index + 1
       }
-    }
 
-    graph <- addEdge(from=n_from, to=n_to, graph=graph, weights=n_weights)
+      graph <- addEdge(from=n_from, to=n_to, graph=graph, weights=n_weights)
 
-    # hameltonian stuff
-    edge_weights       <- rep(1, length(edgeNames(graph)))
-    path               <- compute_hamiltonian(graph, n_from, n_to)
-    edge_weights[path] <- 5
-    edge_colour        <- rep("grey40", length(edge_weights))
-    edge_colour[path]  <- "cyan"
+      # hameltonian stuff
+      edge_weights       <- rep(1, length(edgeNames(graph)))
+      path               <- compute_hamiltonian(graph, n_from, n_to)
+      edge_weights[path] <- 5
+      edge_colour        <- rep("grey40", length(edge_weights))
+      edge_colour[path]  <- "cyan"
 
-    igplot(graph, edge.width=edge_weights, edge.color=edge_colour)
-    })
+      igplot(graph, edge.width=edge_weights, edge.color=edge_colour)
+      })
+
+  })
 
 }
 
